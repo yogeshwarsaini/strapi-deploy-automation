@@ -3,7 +3,7 @@ name: Build and Push Strapi Docker Image
 on:
   push:
     branches:
-      - main  # ya aapka branch jahan se CI run karna chahte ho
+      - task-5  # ya aapka branch jahan se CI run karna chahte ho
 
 jobs:
   build:
