@@ -15,7 +15,8 @@ RUN yarn install
 COPY ./my-strapi-app/ .
 
 # Step 6: Build the Strapi app
-RUN yarn build
+RUN chmod +x node_modules/.bin/strapi && yarn build
+
 
 # Step 7: Expose port
 EXPOSE 1337
