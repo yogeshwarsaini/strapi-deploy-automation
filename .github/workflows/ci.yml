@@ -3,12 +3,13 @@ name: Build and Push Strapi Docker Image
 on:
   push:
     branches:
-        main
+      - main
       - task-5  # ya aapka branch jahan se CI run karna chahte ho
-      
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -24,5 +25,5 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/strapi-app:latest -f Dockerfile .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/strapi-app:latest -f task-5/Dockerfile task-5/
           docker push ${{ secrets.DOCKER_USERNAME }}/strapi-app:latest
