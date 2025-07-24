@@ -1,20 +1,24 @@
-# Base image
+# Step 1: Base image
 FROM node:18
 
-# Set working directory
+# Step 2: Set working directory
 WORKDIR /app
 
-# Copy Strapi app from subfolder
-COPY my-strapi-app/ .
+# Step 3: Copy only dependency files first
+COPY ./my-strapi-app/package.json ./ 
+COPY ./my-strapi-app/yarn.lock ./  
 
-# Install dependencies
+# Step 4: Install dependencies
 RUN yarn install
 
-# Build the Strapi app
+# Step 5: Copy full project
+COPY ./my-strapi-app/ .
+
+# Step 6: Build the Strapi app
 RUN yarn build
 
-# Expose port
+# Step 7: Expose port
 EXPOSE 1337
 
-# Start the app
+# Step 8: Start command
 CMD ["yarn", "start"]
