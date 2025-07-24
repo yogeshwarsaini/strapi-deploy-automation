@@ -9,7 +9,7 @@ WORKDIR /app
 
 # Step 4: Copy only the Strapi app code
 COPY ./my-strapi-app/package*.json ./
-COPY ./my-strapi-app/yarn.lock ./
+# COPY ./my-strapi-app/yarn.lock ./
 
 # Step 5: Install dependencies
 RUN yarn install
