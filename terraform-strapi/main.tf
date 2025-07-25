@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "ap-south-1"
+  region = "us-east-2"
 }
 
 # 🔹 Get default VPC and subnets
@@ -43,7 +43,7 @@ resource "aws_security_group" "strapi_sg" {
 
 # 🔹 Security group for ALB (HTTP 80)
 resource "aws_security_group" "alb_sg" {
-  name        = "strapi-alb-sg-new"
+  name        = "strapi-alb-sg-v3"
   description = "Allow HTTP traffic"
 
   ingress {
@@ -89,7 +89,7 @@ resource "aws_lb" "strapi_alb" {
 
 # 🔹 Target Group
 resource "aws_lb_target_group" "strapi_tg" {
-  name        = "strapi-tg-new"
+  name        = "strapi-tg-v3"
   port        = 1337
   protocol    = "HTTP"
   vpc_id      = data.aws_vpc.default.id
