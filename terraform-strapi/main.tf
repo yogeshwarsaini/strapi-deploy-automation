@@ -41,8 +41,7 @@ resource "aws_security_group" "strapi_sg" {
   }
 }
 
-                     # 🔹 Security group for ALB (HTTP 80)
-
+# 🔹 Security group for ALB (HTTP 80) - RENAMED v3
 resource "aws_security_group" "alb_sg_v3" {
   name        = "strapi-alb-sg-v3"
   description = "Allow HTTP traffic"
@@ -69,10 +68,10 @@ resource "aws_instance" "strapi_ec2" {
   key_name               = "shyam"
   vpc_security_group_ids = [
     aws_security_group.strapi_sg.id,
-    aws_security_group.alb_sg.id
+    aws_security_group.alb_sg_v3.id
   ]
 
-  user_data = file("user_data.sh") # Make sure this file sets up Docker + Strapi
+  user_data = file("user_data.sh")
 
   tags = {
     Name = "StrapiServer"
@@ -81,14 +80,14 @@ resource "aws_instance" "strapi_ec2" {
 
 # 🔹 Application Load Balancer
 resource "aws_lb" "strapi_alb" {
-  name               = "strapi-alb-v3"
+  name               = "strapi-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb_sg.id]
+  security_groups    = [aws_security_group.alb_sg_v3.id]
   subnets            = data.aws_subnets.default.ids
 }
 
-                          # 🔹 Target Group
+# 🔹 Target Group - RENAMED v3
 resource "aws_lb_target_group" "strapi_tg_v3" {
   name        = "strapi-tg-v3"
   port        = 1337
@@ -107,7 +106,7 @@ resource "aws_lb_target_group" "strapi_tg_v3" {
   }
 }
 
-# 🔹 Listener to forward port 80 to EC2:1337
+# 🔹 Listener to forward port 80 to EC2:1337 - USING v3 target group
 resource "aws_lb_listener" "strapi_listener_v3" {
   load_balancer_arn = aws_lb.strapi_alb.arn
   port              = 80
@@ -119,7 +118,7 @@ resource "aws_lb_listener" "strapi_listener_v3" {
   }
 }
 
-# 🔹 Attach EC2 instance to Target Group
+# 🔹 Attach EC2 instance to Target Group - USING v3 target group
 resource "aws_lb_target_group_attachment" "strapi_attachment_v3" {
   target_group_arn = aws_lb_target_group.strapi_tg_v3.arn
   target_id        = aws_instance.strapi_ec2.id
