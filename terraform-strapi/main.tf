@@ -80,7 +80,7 @@ resource "aws_instance" "strapi_ec2" {
 
 # 🔹 Application Load Balancer
 resource "aws_lb" "strapi_alb" {
-  name               = "strapi-alb-v2"
+  name               = "strapi-alb-v3"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
