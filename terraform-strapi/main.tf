@@ -42,7 +42,7 @@ resource "aws_security_group" "strapi_sg" {
 }
 
 # 🔹 Security group for ALB (HTTP 80)
-resource "aws_security_group" "alb_sg_v2" {
+resource "aws_security_group" "alb_sg" {
   name        = "strapi-alb-sg-v2"
   description = "Allow HTTP traffic"
 
@@ -88,7 +88,7 @@ resource "aws_lb" "strapi_alb" {
 }
 
 # 🔹 Target Group
-resource "aws_lb_target_group" "strapi_tg_v2" {
+resource "aws_lb_target_group" "strapi_tg" {
   name        = "strapi-tg-v2"
   port        = 1337
   protocol    = "HTTP"
