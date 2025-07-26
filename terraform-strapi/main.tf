@@ -84,7 +84,8 @@ resource "aws_lb" "strapi_alb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg_v3.id]
-  subnets            = data.aws_subnets.default.ids
+  subnets = [data.aws_subnets.default.ids[0], data.aws_subnets.default.ids[1]]
+
 }
 
 # 🔹 Target Group - RENAMED v3
