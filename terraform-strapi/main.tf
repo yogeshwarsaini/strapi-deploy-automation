@@ -2,19 +2,11 @@ provider "aws" {
   region = "us-east-2"
 }
 
-# 🔹 Get default VPC and subnets
-data "aws_vpc" "default" {
-  default = true
-}
+# resource "aws_key_pair" "deployer" {
+#   key_name   = "shyam"
+#   public_key = file("~/.ssh/id_rsa.pub")
+# }
 
-data "aws_subnets" "default" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
-  }
-}
-
-# 🔹 Security group for EC2 (Strapi port + SSH)
 resource "aws_security_group" "strapi_sg" {
   name        = "strapi-sg-shyam"
   description = "Allow ports for Strapi and SSH"
@@ -41,92 +33,15 @@ resource "aws_security_group" "strapi_sg" {
   }
 }
 
-# 🔹 Security group for ALB (HTTP 80) - RENAMED v3
-resource "aws_security_group" "alb_sg_v3" {
-  name        = "strapi-alb-sg-v3"
-  description = "Allow HTTP traffic"
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-# 🔹 EC2 Instance with Strapi
 resource "aws_instance" "strapi_ec2" {
-  ami                    = "ami-0cd582ee8a22cc7be" # Ubuntu 22.04
-  instance_type          = "t2.micro"
-  key_name               = "shyam"
-  vpc_security_group_ids = [
-    aws_security_group.strapi_sg.id,
-    aws_security_group.alb_sg_v3.id
-  ]
+  ami             = "ami-0cd582ee8a22cc7be" # Example Ubuntu 22.04 AMI
+  instance_type   = "t2.micro"
+  key_name        = "shyam" # 👈 Existing key name
+  security_groups = [aws_security_group.strapi_sg.name]
 
   user_data = file("user_data.sh")
 
   tags = {
     Name = "StrapiServer"
   }
-}
-
-# 🔹 Application Load Balancer
-resource "aws_lb" "strapi_alb" {
-  name               = "strapi-alb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb_sg_v3.id]
-  subnets = [data.aws_subnets.default.ids[0], data.aws_subnets.default.ids[1]]
-
-}
-
-# 🔹 Target Group - RENAMED v3
-resource "aws_lb_target_group" "strapi_tg_v3" {
-  name        = "strapi-tg-v3"
-  port        = 1337
-  protocol    = "HTTP"
-  vpc_id      = data.aws_vpc.default.id
-  target_type = "instance"
-
-  health_check {
-    path                = "/"
-    port                = "1337"
-    protocol            = "HTTP"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-  }
-}
-
-# 🔹 Listener to forward port 80 to EC2:1337 - USING v3 target group
-resource "aws_lb_listener" "strapi_listener_v3" {
-  load_balancer_arn = aws_lb.strapi_alb.arn
-  port              = 80
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.strapi_tg_v3.arn
-  }
-}
-
-# 🔹 Attach EC2 instance to Target Group - USING v3 target group
-resource "aws_lb_target_group_attachment" "strapi_attachment_v3" {
-  target_group_arn = aws_lb_target_group.strapi_tg_v3.arn
-  target_id        = aws_instance.strapi_ec2.id
-  port             = 1337
-}
-
-# 🔹 Output ALB DNS
-output "alb_dns" {
-  value = aws_lb.strapi_alb.dns_name
 }
